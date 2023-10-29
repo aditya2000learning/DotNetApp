@@ -5,7 +5,7 @@ trigger:
       - '*'
 
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 container: mcr.microsoft.com/dotnet/sdk:7.0 
 
@@ -19,14 +19,14 @@ stages:
     jobs:
       - job: Build
         steps:
-        - task: UseDotNet@2
-          displayName: Install Dotnet
-          inputs:
-            packageType: sdk
-            version: '7.x'
-            includePreviewVersions: true
-            installationPath: '$(Agent.ToolsDirectory)/dotnet'
-            performMultiLevelLookup: true
+        # - task: UseDotNet@2
+        #   displayName: Install Dotnet
+        #   inputs:
+        #     packageType: sdk
+        #     version: '7.x'
+        #     includePreviewVersions: true
+        #     installationPath: '$(Agent.ToolsDirectory)/dotnet'
+        #     performMultiLevelLookup: true
 
         - task: DotNetCoreCLI@2
           displayName: 'dotnet restore'
