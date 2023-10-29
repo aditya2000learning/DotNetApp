@@ -4,54 +4,83 @@ trigger:
     include:
       - '*'
 
-pool:
-  vmImage: ubuntu-latest
-
-container: mcr.microsoft.com/dotnet/sdk:7.0 
-
 variables:
 - name: buildConfiguration
   value: 'Release'
 
-stages:
-  - stage: Build
-    displayName: Dotnet Build 
-    jobs:
-      - job: Build
-        steps:
-        # - task: UseDotNet@2
-        #   displayName: Install Dotnet
-        #   inputs:
-        #     packageType: sdk
-        #     version: '7.x'
-        #     includePreviewVersions: true
-        #     installationPath: '$(Agent.ToolsDirectory)/dotnet'
-        #     performMultiLevelLookup: true
 
-        - task: DotNetCoreCLI@2
-          displayName: 'dotnet restore'
-          inputs:
-            command: 'restore'
-            projects: '**/*.csproj'
+pool:
+  vmImage: ubuntu-latest
+
+container : mcr.microsoft.com/dotnet/sdk:7.0
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Dotnet Publish'
+    inputs:
+      command: 'publish'
+      publishWebProjects: true
+      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+  
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Artifacts'
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+      artifact: 'artifacts'
+      publishLocation: 'pipeline'
+
+
+# stages:
+#   - stage: Build
+#     displayName: Dotnet Build 
+#     jobs:
+#       - job: Build
+#         steps:
+#         # - task: UseDotNet@2
+#         #   displayName: Install Dotnet
+#         #   inputs:
+#         #     packageType: sdk
+#         #     version: '7.x'
+#         #     includePreviewVersions: true
+#         #     installationPath: '$(Agent.ToolsDirectory)/dotnet'
+#         #     performMultiLevelLookup: true
+
+#         - task: DotNetCoreCLI@2
+#           displayName: 'dotnet restore'
+#           inputs:
+#             command: 'restore'
+#             projects: '**/*.csproj'
         
-        - task: DotNetCoreCLI@2
-          displayName: 'dotnet build'
-          inputs:
-            command: 'build'
-            projects: '**/*.csproj'
-            arguments: '--no-restore --configuration $(buildConfiguration)'
+#         - task: DotNetCoreCLI@2
+#           displayName: 'dotnet build'
+#           inputs:
+#             command: 'build'
+#             projects: '**/*.csproj'
+#             arguments: '--no-restore --configuration $(buildConfiguration)'
         
-        - task: DotNetCoreCLI@2
-          displayName: 'Dotnet Publish'
-          inputs:
-            command: 'publish'
-            publishWebProjects: true
-            arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+#         - task: DotNetCoreCLI@2
+#           displayName: 'Dotnet Publish'
+#           inputs:
+#             command: 'publish'
+#             publishWebProjects: true
+#             arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         
-        - task: PublishPipelineArtifact@1
-          displayName: 'Publish Artifacts'
-          inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifact: 'artifacts'
-            publishLocation: 'pipeline'
+#         - task: PublishPipelineArtifact@1
+#           displayName: 'Publish Artifacts'
+#           inputs:
+#             targetPath: '$(Build.ArtifactStagingDirectory)'
+#             artifact: 'artifacts'
+#             publishLocation: 'pipeline'
           
